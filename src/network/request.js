@@ -32,10 +32,10 @@ export function request(config) {
         return res.data ? res.data : res;
     }, err=>{
         // 如果有需要授权才可以访问的接口， 统一去login授权
-        // if(err.response.status == '401') {
-        //     Toast.fail('请先登录');
-        //     // this.router.push({path:'/login'});
-        // }
+        if(err.response.status == '401') {
+            Toast.fail('请先登录');
+            // this.router.push({path:'/login'});
+        }
 
         // 如果有错误，这里面会去处理，显示错误信息
         Notify(err.response.data.errors[Object.keys(err.response.data.errors)[0]][0])

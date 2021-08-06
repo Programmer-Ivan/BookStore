@@ -47,8 +47,9 @@ export default {
       pullUpLoad: this.PullUpLoad,
       mouseWheel: true,
       disableTouch: false,
+      // scrollX:true,
     })
-    console.log(this.scroll)
+    // console.log(this.scroll)
     if(this.probeTypes === 2 || this.probeTypes === 3){
       this.scroll.on('scroll' , position => {
         this.$emit('scroll' , position)

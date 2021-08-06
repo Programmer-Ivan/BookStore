@@ -4,7 +4,8 @@ import { Swipe, SwipeItem , Lazyload , Form , Field , Button
 ,GoodsAction, GoodsActionIcon, GoodsActionButton,
   Tab, Tabs ,Sidebar, SidebarItem , Collapse, CollapseItem,
   Card ,Badge , Checkbox, CheckboxGroup , Cell , CellGroup
-   , Stepper ,SwipeCell ,SubmitBar , Icon ,AddressList ,AddressEdit } from 'vant';
+   , Stepper ,SwipeCell ,SubmitBar , Icon ,AddressList ,AddressEdit ,Popup ,Grid,GridItem,
+    Image as VanImage} from 'vant';
 
 Vue.use(Swipe);
 Vue.use(SwipeItem);
@@ -32,9 +33,14 @@ Vue.use(SubmitBar);
 Vue.use(Icon );
 Vue.use(AddressList  );
 Vue.use(AddressEdit  );
-
+Vue.use(Popup   );
+Vue.use(Grid   );
+Vue.use(GridItem   );
+Vue.use(VanImage)
 
 
 Vue.use(Lazyload , {
-  loading:require('../../../assets/images/default.png')
+  loading:require('../../../assets/images/default.png'),
+    lazyComponent: true,
+    listenEvents:''
 })

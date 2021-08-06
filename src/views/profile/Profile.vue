@@ -12,7 +12,7 @@
         <div class="right">
           <p>昵称：{{user.name}}</p>
           <p>登录名称：{{user.email}}</p>
-          <p>个性签名：aaa
+          <p>账号创建时间：{{user.created_at}}
           </p>
         </div>
       </div>
@@ -95,6 +95,7 @@ export default {
   mounted() {
     getUser().then(res =>{
         this.user = res
+      console.log(res)
     })
   }
 }
@@ -129,7 +130,7 @@ export default {
   color: #FFFFFF;
 }
 .top-content .right p{
-  margin: 5px 0;
+  margin: 8px 0;
 }
 .bottom-content{
   width: 100%;

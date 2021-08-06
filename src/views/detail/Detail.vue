@@ -6,41 +6,40 @@
     </nav-bar>
 
 
-    <div class="content-pro">
-      <detail-swiper :banners="banners"/>
+    <scroll class="scrollY" ref="scroll">
+        <detail-swiper :banners="goods_list.banners"/>
 
-      <div class="content">
-        <div class="title">
-          <p>{{ this.title }}</p>
-          <p>{{ this.description }}</p>
-          <div class="f">
-            <span>新书</span>
-            <span>推荐</span>
+        <div class="content">
+          <div class="title">
+            <p>{{ goods_list.title }}</p>
+            <p>{{ goods_list.description }}</p>
+            <div class="f">
+              <span>新书</span>
+              <span>推荐</span>
+            </div>
           </div>
+          <p style="margin-top: 20px">￥{{ goods_list.price }}</p>
         </div>
-        <p style="margin-top: 20px">￥{{ this.price }}</p>
-      </div>
 
-      <van-tabs v-model="activeName" class="tab">
-        <van-tab title="概述" name="a">
-          <div id="con1" v-html="this.details"></div>
-        </van-tab>
-        <van-tab title="热评" name="b">
-          评论~~~~~
-          <div id="con1" v-html="this.details"></div>
-        </van-tab>
-        <van-tab title="相关书籍" name="c">
-          推荐······
-          <div id="con1" v-html="this.details"></div>
-        </van-tab>
-      </van-tabs>
-    </div>
+        <van-tabs v-model="activeName" class="tab">
+          <van-tab title="概述" name="a">
+            <div id="con1" v-html="goods_list.details"></div>
+          </van-tab>
+          <van-tab title="热评" name="b">
+            评论~~~~~
+            <div id="con1" v-html="goods_list.details"></div>
+          </van-tab>
+          <van-tab title="相关书籍" name="c">
+            <goods-list :goods="like_goods"/>
+          </van-tab>
+        </van-tabs>
+    </scroll>
 
 
     <van-goods-action class="footer">
-      <van-goods-action-icon icon="chat-o" text="客服" dot/>
-      <van-goods-action-icon icon="cart-o" text="购物车" badge="5"/>
-      <van-goods-action-icon icon="shop-o" text="店铺" badge="12"/>
+      <van-goods-action-icon icon="chat-o" text="客服"/>
+      <van-goods-action-icon icon="cart-o" text="购物车" :badge="$store.state.count"/>
+      <van-goods-action-icon icon="star" :text="collect?'已收藏':'收藏'" :color="collect?'#ff5000': ''" @click="cellectClick"/>
       <van-goods-action-button type="warning" text="加入购物车" @click="addcart"/>
       <van-goods-action-button type="danger" text="立即购买" @click="buy"/>
     </van-goods-action>
@@ -48,30 +47,35 @@
 </template>
 
 <script>
+import GoodsList from "../../components/content/goods/GoodsList";
 import NavBar from "@/components/content/navbar/NavBar";
 import DetailSwiper from "./childComps/DetailSwiper";
 import TabControl from "../../components/content/tabcontrol/TabControl";
 import {getDetail, detailBanner} from '@/network/detail'
+import {collect} from "../../network/collect";
 import {addCart} from '@/network/cart'
 import {Toast} from 'vant';
-
+import Scroll from "../../components/common/scroll/Scroll";
 export default {
   name: "Detail",
   components: {
     NavBar,
     DetailSwiper,
-    TabControl
+    TabControl,
+    GoodsList,
+    Scroll
   },
   data() {
     return {
+      //商品ID
       id: null,
-      banners: '',
-      stock: 0,
-      price: 0,
-      description: '',
-      title: 0,
-      details: '',
       activeName: 0,
+      // 请求下来的数据
+      goods_list: {},
+      //传递给推荐书籍
+      like_goods:[],
+    //  收藏变量
+      collect: false,
     }
   },
   methods: {
@@ -86,27 +90,54 @@ export default {
     buy() {
       addCart({goods_id: 25, num: 1}).then(res => {
         if (res.status == '201' || res.status == '204') {
+          Toast.success('添加成功,显示购物车');
+          this.$store.dispatch('updata')
           this.$router.push('/cart')
         }
       })
     },
-
     itemClick(index) {
-      console.log(index)
+      // console.log(index)
+    },
+    collectload() {
+      collect(this.id).then(res => {
+        if(res.status === 201){
+          console.log(res)
+          Toast.success('收藏成功')
+        }else if(res.status === 204){
+          console.log(res)
+          Toast.success('取消收藏')
+        }
+      })
+    },
+  //  点击是否收藏
+    cellectClick() {
+      this.collect = !this.collect
+      if(this.collect){
+        this.collectload()
+      }else{
+        this.collectload()
+      }
     }
   },
   created() {
     this.id = this.$route.query.id
+    console.log(this.id)
     getDetail(this.id).then(res => {
-      console.log(this.id)
-      this.banners = res.goods.cover_url
-      this.stock = res.goods.stock
-      this.price = res.goods.price
-      this.description = res.goods.description
-      this.title = res.goods.title
-      this.details = res.goods.details
+      // console.log(this.id)
+      this.goods_list = {
+        banners: res.goods.cover_url,
+        stock: res.goods.stock,
+        price: res.goods.price,
+        description: res.goods.description,
+        title: res.goods.title,
+        details: res.goods.details
+      }
+      this.like_goods = res.like_goods
     })
-
+  },
+  updated() {
+    this.$refs.scroll.refresh()
   }
 }
 </script>
@@ -114,19 +145,17 @@ export default {
 <style scoped>
 .detail {
   position: relative;
-  height: 100vh;
 }
-
-.content-pro {
+.scrollY{
   position: absolute;
   top: 44px;
+  bottom: 49px;
   left: 0;
   right: 0;
-  bottom: 50px;
-  background: #FFFFFF;
-  z-index: 9;
 }
-
+.content{
+  padding-left: 30px;
+}
 .footer {
   position: fixed;
   bottom: 0;
@@ -138,10 +167,6 @@ export default {
   padding: 2px;
   font-size: 10px;
   color: red;
-}
-
-.control {
-  background: slateblue;
 }
 
 .nav {

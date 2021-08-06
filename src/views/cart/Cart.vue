@@ -1,12 +1,11 @@
 <template>
   <div>
     <nav-bar bg="rgb(255, 129, 152)" color="#fff">
-      <div slot="left"><img class="left-img" src="../../assets/images/left.png" alt=""></div>
       <div slot="center">图书兄弟-购物车</div>
     </nav-bar>
 
     <div class="content">
-      <van-checkbox-group v-model="userGoods.result" @change="onChange">
+      <van-checkbox-group ref="checkboxGroup" v-model="userGoods.result" @change="onChange">
         <van-cell-group>
           <van-cell v-for="(item,index) in userGoods.list">
             <template #right-icon>
@@ -24,9 +23,14 @@
                 </div>
                 <div class="bottom">
                   <span class="price">￥{{item.goods.price  + '.00'}}</span>
+
                   <div class="button">
-                    <van-stepper integer :min="1" :max="item.goods.stock" :model-value="item.num" :name="item.id" async-change
-                                 @change="onChange"/>
+<!--                    <van-stepper integer :min="1" :max="item.goods.stock"-->
+<!--                                 :model-value="3" :name="item.id"-->
+<!--                                 async-change-->
+<!--                                 @change="updateChange"/>-->
+                    <van-stepper integer :value="item.num" async-change @change="updateChange"
+                                 :min="1" :max="item.goods.stock" :name="item.id" />
                   </div>
                 </div>
               </div>
@@ -36,6 +40,7 @@
 
         </van-cell-group>
       </van-checkbox-group>
+
       <div v-if="this.userGoods['list'].length">
         <van-submit-bar class="submit" :price="showSum * 100" button-text="提交订单" @submit="onSubmit">
           <van-checkbox v-model="checked" @click="checkAll">全选</van-checkbox>
@@ -55,7 +60,7 @@
 import NavBar from "@/components/content/navbar/NavBar";
 import Scroll from "../../components/common/scroll/Scroll";
 import { Toast ,Dialog } from 'vant'
-import {getCart , checkedCard , deleteCartItem} from '../../network/cart'
+import {getCart , modifyCart , deleteCartItem ,checkedCard} from '../../network/cart'
 export default {
   name: "Cart",
   data(){
@@ -72,11 +77,11 @@ export default {
     Scroll
   },
   computed:{
+    //计算价格
     showSum(){
       let sum = 0
         this.userGoods.list.filter(item => this.userGoods.result.includes(item.id)).forEach(item =>{
               sum += parseInt(item.num) * parseFloat(item.goods.price);
-              // console.log(sum)
             })
       return sum
     }
@@ -85,6 +90,22 @@ export default {
     goto(){
       this.$router.push('/home')
     },
+    // 异步改变购物车数量
+    //组件里提供name属性通过name可以获取两个参数，第一个是数量，第二个是当前商品的id
+    updateChange(value , detail) {
+      Toast.loading({message:'修改中...', forbidClick:true});
+      console.log(value , detail)
+      modifyCart(detail.name , {num:value}).then(res => {
+        this.userGoods.list.forEach(item => {
+          if(item.id == detail.name) {
+            item.num = value;
+          }
+        })
+        Toast.clear();
+
+      })
+    },
+    //点击当选按钮
     onChange(result){
       this.userGoods.result = result
       checkedCard({cart_ids:result})
@@ -142,11 +163,9 @@ export default {
   },
   mounted() {
     this.getCart()
-    console.log(this.showSum)
   },
   //进入时重新刷新页面数据
   activated() {
-    Toast.loading({message:'加载中...', forbidClick:true});
     this.getCart()
   }
 }

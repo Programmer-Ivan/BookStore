@@ -12,6 +12,8 @@ const login = () => import('../views/profile/login/Login')
 const detail = () => import('../views/detail/Detail')
 const address = () => import('../views/profile/address/AddRess')
 const newadd = () => import('../views/profile/address/newAdd')
+const createorder = () => import('../views/order/CreateOrder')
+const orderdetail = () => import('../views/order/OrderDetail')
 
 Vue.use(VueRouter)
 
@@ -86,6 +88,20 @@ const routes = [
     component: newadd,
     meta: {
       title:'修改地址'
+    }
+  },
+  {
+    path:'/createorder',
+    component: createorder,
+    meta: {
+      title:'订单预览'
+    }
+  },
+  {
+    path:'/orderdetail',
+    component: orderdetail,
+    meta: {
+      title:'订单状态'
     }
   },
 

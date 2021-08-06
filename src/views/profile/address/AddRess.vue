@@ -7,7 +7,7 @@
 
 
     <van-address-list
-        v-model="list.chosenAddressId"
+        v-model="chosenAddressId"
         :list="list"
         :disabled-list="disabledList"
         disabled-text="以下地址超出配送范围"
@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      // chosenAddressId: '1',
+      chosenAddressId: '0',
       list: [],
       disabledList: [
         {
@@ -59,11 +59,9 @@ export default {
             name: item.name,
             tel: item.phone,
             address: `${item.province} ${item.city} ${item.county} ${item.address}`,
-            isDefault: !!item.is_default,
-            chosenAddressId: item.is_default
+            isDefault: item.is_default,
           }
         })
-        // this.chosenAddressId= this.list[0].id
       })
     }
   },

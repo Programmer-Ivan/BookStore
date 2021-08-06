@@ -109,7 +109,9 @@ export default {
           // console.log(this.addressInfo)
         })
       }
-    }
+    },
+
+
 
   },
   mounted() {
@@ -128,23 +130,18 @@ export default {
     this.AddressID = this.$route.query.addressID
 
     this.EditAddress()
-    console.log(this.type)
-  },
-  activated() {
-    this.title = this.$route.query.type
 
   },
   deactivated() {
-    Toast('您的网络故障')
+    Toast.loading({message:'加载中...', forbidClick:true});
     setTimeout(() =>{
       this.$router.go(0)
     },1000)
-    console.log('不活跃没有销毁')
-
+    Toast.clear();
   },
-  destroyed() {
-    console.log('页面删除')
-  }
+  // destroyed() {
+  //   console.log('页面删除')
+  // }
 }
 </script>
 

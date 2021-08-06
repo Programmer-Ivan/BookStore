@@ -1,7 +1,6 @@
 <template>
   <div id="home">
     <nav-bar class="nav-bar" bg="rgb(255, 129, 152)" color="#fff">
-      <div slot="left"><img class="left-img" src="../../assets/images/left.png" alt=""></div>
       <div slot="center">兄弟图书</div>
     </nav-bar>
 
@@ -117,9 +116,9 @@ export default {
     //  监听图片是否加载完成
     const refresh = debounce(this.$refs.scroll.refresh , 50)
     this.$bus.$on('itemImageLoad', () => {
-      // this.$refs.scroll.refresh()
+      // this.$refs.scroll.refresh()5
       refresh()
-      console.log("高度："+this.$refs.scroll.scroll.scrollerHeight)
+      // console.log("高度："+this.$refs.scroll.scroll.scrollerHeight)
     })
   },
   methods: {
